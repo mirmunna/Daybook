@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>Untitled</title>
+  <link rel="stylesheet" href="./style.css">
+
+</head>
+<body>
+<!-- partial:index.partial.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mir Kiryana Shop - Next Gen PWA</title>
+
+  <!-- Google Fonts: Poppins & Material Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+
+  <!-- Main stylesheet -->
+  <link rel="stylesheet" href="styles.css" />
+
+  <!-- jsPDF libraries -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js" defer></script>
+
+  <!-- App JS -->
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <header>
+    <div class="logo" tabindex="0">Mir Kiryana Shop</div>
+    <button id="menu-toggle" aria-label="Toggle navigation menu" aria-expanded="false">
+      <span class="material-icons">menu</span>
+    </button>
+  </header>
+
+  <div id="container">
+    <nav id="sidebar" role="navigation" aria-label="Main Navigation" tabindex="0">
+      <ul>
+        <li class="nav-item active" data-target="dashboard" tabindex="0" role="button" aria-current="page">
+          <span class="material-icons" aria-hidden="true">dashboard</span>
+          <span>Dashboard</span>
+        </li>
+        <li class="nav-item" data-target="customers" tabindex="0" role="button">
+          <span class="material-icons" aria-hidden="true">people</span>
+          <span>Customers</span>
+        </li>
+        <li class="nav-item" data-target="products" tabindex="0" role="button">
+          <span class="material-icons" aria-hidden="true">inventory_2</span>
+          <span>Products</span>
+        </li>
+        <li class="nav-item" data-target="transactions" tabindex="0" role="button">
+          <span class="material-icons" aria-hidden="true">receipt_long</span>
+          <span>Transactions</span>
+        </li>
+        <li class="nav-item" data-target="reports" tabindex="0" role="button">
+          <span class="material-icons" aria-hidden="true">bar_chart</span>
+          <span>Reports</span>
+        </li>
+        <li class="nav-item" data-target="settings" tabindex="0" role="button">
+          <span class="material-icons" aria-hidden="true">settings</span>
+          <span>Settings</span>
+        </li>
+      </ul>
+    </nav>
+
+    <main>
+      <section id="dashboard" class="module active" tabindex="0" aria-label="Dashboard">
+        <h2>Welcome to Mir Kiryana Shop</h2>
+        <p>Use the menu to manage customers, family members, products, transactions, and generate reports.</p>
+        <section aria-live="polite" aria-atomic="true" id="dashboard-summary" class="dashboard-summary">
+          <h3>Summary</h3>
+          <ul>
+            <li>Total Customers: <strong id="summary-customers">0</strong></li>
+            <li>Total Products: <strong id="summary-products">0</strong></li>
+            <li>Total Transactions: <strong id="summary-transactions">0</strong></li>
+            <li>Total Sales: <strong id="summary-sales">₹0.00</strong></li>
+          </ul>
+        </section>
+      </section>
+
+      <section id="customers" class="module" tabindex="0" aria-label="Customers Management" hidden>
+        <h2>Customers</h2>
+        <input type="search" id="search-customers" class="search-input" aria-label="Search customers" placeholder="Search Customers..." autocomplete="off" />
+        <form id="customer-form" autocomplete="off" novalidate aria-label="Add or update customer">
+          <input type="hidden" id="customer-id" />
+          <label for="customer-name">Name <sup aria-label="required">*</sup></label>
+          <input type="text" id="customer-name" required aria-required="true" />
+          <label for="customer-phone">Phone</label>
+          <input type="text" id="customer-phone" pattern="[0-9+ ()-]{7,15}" placeholder="+1234567890" autocomplete="off" />
+          <label for="customer-address">Address</label>
+          <textarea id="customer-address" maxlength="140"></textarea>
+          <button type="submit" class="btn-primary pulse" aria-label="Save customer">Save Customer</button>
+          <button type="button" id="customer-clear" aria-label="Clear customer form">Clear</button>
+        </form>
+
+        <h3>Family Members</h3>
+        <form id="family-member-form" autocomplete="off" novalidate aria-label="Add family member for selected customer">
+          <input type="hidden" id="family-customer-id" />
+          <label for="family-member-name">Name <sup aria-label="required">*</sup></label>
+          <input type="text" id="family-member-name" required aria-required="true" />
+          <label for="family-member-relation">Relation <sup aria-label="required">*</sup></label>
+          <input type="text" id="family-member-relation" required aria-required="true" />
+          <button type="submit" class="btn-primary pulse" aria-label="Add family member">Add Family Member</button>
+          <button type="button" id="family-clear" aria-label="Clear family member form">Clear</button>
+        </form>
+
+        <table id="family-members-table" aria-label="Family members list">
+          <thead>
+            <tr><th>Name</th><th>Relation</th><th>Actions</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+
+        <table id="customers-table" aria-label="Customers list">
+          <thead>
+            <tr><th>Name</th><th>Phone</th><th>Address</th><th>Actions</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </section>
+
+      <section id="products" class="module" tabindex="0" aria-label="Products Management" hidden>
+        <h2>Products</h2>
+        <input type="search" id="search-products" class="search-input" aria-label="Search products" placeholder="Search Products..." autocomplete="off" />
+        <form id="product-form" autocomplete="off" novalidate aria-label="Add or update product">
+          <input type="hidden" id="product-id" />
+          <label for="product-name">Name <sup aria-label="required">*</sup></label>
+          <input type="text" id="product-name" required aria-required="true" />
+          <label for="product-stock">Stock Quantity <sup aria-label="required">*</sup></label>
+          <input type="number" id="product-stock" min="0" required aria-required="true" />
+          <label for="product-price">Price (₹) <sup aria-label="required">*</sup></label>
+          <input type="number" id="product-price" min="0" step="0.01" required aria-required="true" />
+          <button type="submit" class="btn-primary pulse" aria-label="Save product">Save Product</button>
+          <button type="button" id="product-clear" aria-label="Clear product form">Clear</button>
+        </form>
+        <table id="products-table" aria-label="Products list">
+          <thead>
+            <tr><th>Name</th><th>Stock</th><th>Price</th><th>Actions</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </section>
+
+      <section id="transactions" class="module" tabindex="0" aria-label="Transactions Management" hidden>
+        <h2>Transactions</h2>
+        <input type="search" id="search-transactions" class="search-input" aria-label="Search transactions" placeholder="Search Transactions..." autocomplete="off" />
+        <form id="transaction-form" autocomplete="off" novalidate aria-label="Add transaction">
+          <label for="transaction-date">Date <sup aria-label="required">*</sup></label>
+          <input type="date" id="transaction-date" required aria-required="true" />
+          <label for="transaction-customer">Customer <sup aria-label="required">*</sup></label>
+          <select id="transaction-customer" required aria-required="true">
+            <option value="" disabled selected>Select customer</option>
+          </select>
+          <label for="transaction-family-member">Family Member <sup aria-label="required">*</sup></label>
+          <select id="transaction-family-member" required aria-required="true" disabled>
+            <option value="" disabled selected>Select family member</option>
+          </select>
+          <label for="transaction-product">Product <sup aria-label="required">*</sup></label>
+          <select id="transaction-product" required aria-required="true">
+            <option value="" disabled selected>Select product</option>
+          </select>
+          <label for="transaction-quantity">Quantity <sup aria-label="required">*</sup></label>
+          <input type="number" id="transaction-quantity" min="1" value="1" required aria-required="true" />
+          <button type="submit" class="btn-primary pulse" aria-label="Add transaction">Add Transaction</button>
+          <button type="button" id="transaction-clear" aria-label="Clear transaction form">Clear</button>
+        </form>
+        <table id="transactions-table" aria-label="Transactions list">
+          <thead><tr><th>Date</th><th>Customer</th><th>Family Member</th><th>Product</th><th>Quantity</th><th>Total Price</th><th>Actions</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </section>
+
+      <section id="reports" class="module" tabindex="0" aria-label="Reports" hidden>
+        <h2>Reports</h2>
+        <form id="report-form" autocomplete="off" novalidate aria-label="Generate reports">
+          <label for="report-type">Report Type <sup aria-label="required">*</sup></label>
+          <select id="report-type" required aria-required="true">
+            <option value="daily">Daily</option>
+            <option value="monthly">Monthly</option>
+            <option value="customer">Customer</option>
+          </select>
+          <label for="report-date" id="label-report-date">Select Date <sup aria-label="required">*</sup></label>
+          <input type="date" id="report-date" />
+          <label for="report-customer" id="label-report-customer" style="display:none;">Select Customer <sup aria-label="required">*</sup></label>
+          <select id="report-customer" style="display:none;">
+            <option value="" disabled selected>Select customer</option>
+          </select>
+          <button type="submit" class="btn-primary pulse" style="margin-top: 10px;">Generate PDF Report</button>
+        </form>
+        <div id="report-feedback" aria-live="polite" style="margin-top: 20px; font-weight: 700; color: #92400e;"></div>
+      </section>
+
+      <section id="settings" class="module" tabindex="0" aria-label="Settings" hidden>
+        <h2>Settings</h2>
+        <form id="settings-form" autocomplete="off" novalidate aria-label="Update shop settings">
+          <label for="shop-name">Shop Name <sup aria-label="required">*</sup></label>
+          <input type="text" id="shop-name" required aria-required="true" />
+          <label for="shop-color-primary">Primary Color</label>
+          <input type="color" id="shop-color-primary" value="#fb923c" />
+          <label for="shop-color-secondary">Secondary Color</label>
+          <input type="color" id="shop-color-secondary" value="#f97316" />
+          <button type="submit" class="btn-primary pulse">Save Settings</button>
+          <button type="button" class="btn-primary pulse" id="toggle-dark-btn" style="margin-left: 10px;">Toggle Dark Mode</button>
+        </form>
+      </section>
+    </main>
+  </div>
+
+  <footer>
+    &copy; 2024 Mir Kiryana Shop. All rights reserved.
+  </footer>
+
+  <!-- Chat widget -->
+  <button id="chat-widget-toggle" aria-label="Toggle chat" title="Chat assistant">
+    <span class="material-icons">chat</span>
+  </button>
+  <div id="chat-widget" role="dialog" aria-modal="true" aria-label="Chat assistant" tabindex="-1">
+    <div id="chat-header">Mir Kiryana AI Assistant</div>
+    <div id="chat-messages" aria-live="polite"></div>
+    <form id="chat-form" aria-label="Send chat message">
+      <input id="chat-input" type="text" placeholder="Ask your shop assistant..." autocomplete="off" required />
+      <button type="submit" id="chat-send-btn">Send</button>
+    </form>
+  </div>
+</body>
+</html>
+<!-- partial -->
+  <script  src="./script.js"></script>
+
+</body>
+</html>
